@@ -1,0 +1,303 @@
+"""
+import matplotlib.pyplot as plt
+import numpy as np
+
+#########Exercice 1
+
+def Euler(y0,a,b,nb):
+    h=(b-a)/nb
+    t=a
+    X=[a]
+    Y=[y0]
+    y1=y0
+    for i in range(1,nb):
+        y2=y1+(1+y1**2)*h
+        t=t+h
+        Y.append(y2)
+        X.append(t)
+        y1=y2
+    plt.plot(X,Y)
+    plt.show()
+    return X,Y
+    
+
+#########Exercice 2
+
+###Question 1
+
+m=0.1
+l=0.3
+a=0
+b=5
+A=0.1
+g=9.81
+nb=1000
+V0=[0,1]
+
+def F(t, V):
+    L=[V[1], (A*np.sin(t)-m*g*l*np.sin(V[0]))/(m*l**2)]
+    return L
+    
+
+    
+def NEuler(V0,a,b,nb):
+    h=(b-a)/nb
+    t=a
+    X=[a]
+    Y=[V0[0]]
+    V1=V0
+    for i in range(1,nb):
+        V2=[V1[0]+h*F(t,V1)[0], V1[1]+h*F(t,V1)[1]]
+        t=t+h
+        Y.append(V2[0])
+        X.append(t)
+        V1=V2
+    plt.plot(X,Y,label='NEuler')
+    return X,Y
+    
+
+print(NEuler(V0,a,b,nb))
+
+###Question 2
+#méthode de Runge-Kutta d'ordre 2 dite de Euler-Cauchy
+
+def NRK2(V0,a,b,nb):
+    h=(b-a)/nb
+    t=a
+    X=[a]
+    Y=[V0[0]]
+    V1=V0
+    for i in range(1,nb):
+        V2=[V1[0]+h*F(t+h/2,[V1[0]+h/2*F(t,V1)[0], V1[1]+h/2*F(t,V1)[1]])[0], V1[1]+h*F(t+h/2,[V1[0]+h/2*F(t,V1)[0], V1[1]+h/2*F(t,V1)[1]])[1]]
+        t=t+h
+        Y.append(V2[0])
+        X.append(t)
+        V1=V2
+    plt.plot(X,Y,label='NRK2')
+    return X,Y
+    
+#print(NRK2(V0,a,b,nb))
+
+###Question 3
+#méthode de Runge-Kutta d'ordre 4
+    
+
+def NRK4(V0,a,b,nb):
+    h=(b-a)/nb
+    t=a
+    X=[a]
+    Y=[V0[0]]
+    V1=V0
+    for i in range(1,nb):
+        V2=[0,0]
+        
+        k1=F(t,V1)
+        k2=F(t+h/2,[V1[0]+h/2*k1[0],V1[1]+h/2*k1[1]]) 
+        k3=F(t+h/2,[V1[0]+h/2*k2[0],V1[1]+h/2*k2[1]])
+        k4=F(t+h,[V1[0]+h*k3[0],V1[1]+h*k3[1]])
+        
+        V2[0]=V1[0]+h/6*(k1[0]+2*k2[0]+2*k3[0]+k4[0])
+        V2[1]=V1[1]+h/6*(k1[1]+2*k2[1]+2*k3[1]+k4[1])
+        
+        t=t+h
+        Y.append(V2[0])
+        X.append(t)
+        V1=V2
+    plt.plot(X,Y,label='NRK4')
+    return X,Y
+
+#print(NRK4(V0,a,b,nb))
+
+### Question 4
+#Pour mettre en évidence le frottement sec on ajoute un terme correspondant à la raideur du ressort (k est la raideur)
+
+k=2
+
+def F(t, V):
+    L=[V[1], (A*np.sin(t)-m*g*l*np.sin(V[0])-k*V[0])/(m*l**2)]
+    return L
+
+def NEuler2(V0,a,b,nb):
+    h=(b-a)/nb
+    t=a
+    X=[a]
+    Y=[V0[0]]
+    V1=V0
+    for i in range(1,nb):
+        V2=[V1[0]+h*F(t,V1)[0], V1[1]+h*F(t,V1)[1]]
+        t=t+h
+        Y.append(V2[0])
+        X.append(t)
+        V1=V2
+    plt.plot(X,Y,label='NEuler')
+    return X,Y
+#print(NEuler2(V0,a,b,nb))
+
+
+
+def NRK2_2(V0,a,b,nb):
+    h=(b-a)/nb
+    t=a
+    X=[a]
+    Y=[V0[0]]
+    V1=V0
+    for i in range(1,nb):
+        V2=[V1[0]+h*F(t+h/2,[V1[0]+h/2*F(t,V1)[0], V1[1]+h/2*F(t,V1)[1]])[0], V1[1]+h*F(t+h/2,[V1[0]+h/2*F(t,V1)[0], V1[1]+h/2*F(t,V1)[1]])[1]]
+        t=t+h
+        Y.append(V2[0])
+        X.append(t)
+        V1=V2
+    plt.plot(X,Y,label='NRK2_2')
+    return X,Y
+    
+#print(NRK2_2(V0,a,b,nb))
+    
+
+def NRK4_2(V0,a,b,nb):
+    h=(b-a)/nb
+    t=a
+    X=[a]
+    Y=[V0[0]]
+    V1=V0
+    for i in range(1,nb):
+        V2=[0,0]
+        k1=F(t,V1)
+        k2=F(t+h/2,[V1[0]+h/2*k1[0],V1[1]+h/2*k1[1]]) 
+        k3=F(t+h/2,[V1[0]+h/2*k2[0],V1[1]+h/2*k2[1]])
+        k4=F(t+h,[V1[0]+h*k3[0],V1[1]+h*k3[1]])
+        V2[0]=V1[0]+h/6*(k1[0]+2*k2[0]+2*k3[0]+k4[0])
+        V2[1]=V1[1]+h/6*(k1[1]+2*k2[1]+2*k3[1]+k4[1])
+        t=t+h
+        Y.append(V2[0])
+        X.append(t)
+        V1=V2
+    plt.plot(X,Y,label='NRK4_2')
+    return X,Y
+
+
+#print(NRK4_2(V0,a,b,nb))
+
+
+########### Exercice 3
+
+#### Question 1
+
+c=3
+d=1
+w=30
+
+def F(t,V):
+    L=[V[1], -c*(((V[0]/d)**2)-1)-w**2*V[0]]
+    return L
+    
+#Méthode d'Euler    
+
+def NEuler3(V0,a,b,nb):
+    h=(b-a)/nb
+    t=a
+    X=[a]
+    Y=[V0[0]]
+    V1=V0
+    for i in range(1,nb):
+        V2=[V1[0]+h*F(t,V1)[0], V1[1]+h*F(t,V1)[1]]
+        t=t+h
+        Y.append(V2[0])
+        X.append(t)
+        V1=V2
+    plt.plot(X,Y,label='NEuler')
+    return X,Y
+
+#print(NEuler(V0,a,b,nb))
+
+# Méthode de Ruge-Kutta d'ordre 2
+
+def NRK2_3(V0,a,b,nb):
+    h=(b-a)/nb
+    t=a
+    X=[a]
+    Y=[V0[0]]
+    V1=V0
+    for i in range(1,nb):
+        V2=[V1[0]+h*F(t+h/2,[V1[0]+h/2*F(t,V1)[0], V1[1]+h/2*F(t,V1)[1]])[0], V1[1]+h*F(t+h/2,[V1[0]+h/2*F(t,V1)[0], V1[1]+h/2*F(t,V1)[1]])[1]]
+        t=t+h
+        Y.append(V2[0])
+        X.append(t)
+        V1=V2
+    plt.plot(X,Y,label='NRK2')
+    return X,Y
+    
+#print(NRK2(V0,a,b,nb))
+    
+# Méthode de Ruge_Kutta d'ordre 4
+    
+def NRK4_3(V0,a,b,nb):
+    h=(b-a)/nb
+    t=a
+    X=[a]
+    Y=[V0[0]]
+    V1=V0
+    for i in range(1,nb):
+        V2=[0,0]
+        k1=F(t,V1)
+        k2=F(t+h/2,[V1[0]+h/2*k1[0],V1[1]+h/2*k1[1]]) 
+        k3=F(t+h/2,[V1[0]+h/2*k2[0],V1[1]+h/2*k2[1]])
+        k4=F(t+h,[V1[0]+h*k3[0],V1[1]+h*k3[1]])
+        V2[0]=V1[0]+h/6*(k1[0]+2*k2[0]+2*k3[0]+k4[0])
+        V2[1]=V1[1]+h/6*(k1[1]+2*k2[1]+2*k3[1]+k4[1])
+        t=t+h
+        Y.append(V2[0])
+        X.append(t)
+        V1=V2
+    plt.plot(X,Y,label='NRK4')
+    return X,Y
+
+#print(NRK4(V0,a,b,nb))
+plt.legend()
+
+### Question 2
+def AdamsMoulton(F,V0,a,b,nb):
+    h=(b-a)/nb
+    t=a
+    X=[a]
+    Y=[V0[0]]
+    V1=V0
+    V2 = []
+    for i in range(1,nb):
+        k1 = np.dot(h,F(t, V1))
+        k2 = np.dot(h, F(t+h, V1*k1))
+        k3 = np.dot(h,F(t+2*h, V1+k1+k2))
+        k4 = np.dot(h, F(t+3*h, V1+k1+k2+k3))
+        V2p = V1 +(1/6)*(k1+2*k2+2*k3+k4)
+        V2 = V1+np.dot(h/2,F(t+h,V2p))+np.dot(h/2,F(t,V1))
+        t=t+h
+        Y.append(V2[0])
+        X.append(t)
+        V1=V2
+        plt.plot(X,Y)
+    return X,Y
+#print(AdamsMoulton(F,V0,a,b,nb))
+
+def phase(F,V0,a,b,nb):
+    h=(b-a)/nb
+    t=a
+    X=[a]
+    Y=[V0[0]]
+    V1=V0
+    V2 = []
+    for i in range(1,nb):
+        k1 = np.dot(h,F(t, V1))
+        k2 = np.dot(h, F(t+h, V1*k1))
+        k3 = np.dot(h,F(t+2*h, V1+k1+k2))
+        k4 = np.dot(h, F(t+3*h, V1+k1+k2+k3))
+        V2p = V1 +(1/6)*(k1+2*k2+2*k3+k4)
+        V2 = V1+np.dot(h/2,F(t+h,V2p))+np.dot(h/2,F(t,V1))
+        t=t+h
+        Y.append(V2[0])
+        X.append(V2[1])
+        V1=V2
+        plt.plot(X,Y)
+    return X,Y
+    
+
+#print(phase(F,V0,a,b,nb))    
+
